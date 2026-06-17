@@ -1,0 +1,44 @@
+title: Spinal Loading Model
+description: >
+  This project models a person lifting a 5 kg object and estimates the forces on
+  their lower back across a range of postures, from a deep squat up to a nearly
+  standing position. I was primarily responsible for building a 2D
+  sagittal-plane model of the body as a six-link chain (foot, leg, thigh, trunk,
+  upper arm, and forearm) using standard anthropometric data to set each
+  segment's length and mass from the person's height and weight. For each
+  posture, the code solves an inverse kinematics problem to find joint angles
+  that place the hands at a target position. Additionally, this project assumes
+  that the person is in quasi-static equilibrium which allows us to solve for
+  the spinal force much easier. The output is a series of stick-figure plots
+  plus summary graphs of muscle, shear, and compression forces versus knee
+  angle, which together show why lifting form matters so much.
+
+
+  The hardest part was that the inverse kinematics problem is underdetermined.
+  There are six joint angles but only two position equations, so most
+  mathematical solutions come out biomechanically impossible, and MATLAB's
+  fslove doesn't accept joint limits to rule them out. My teams workaround was
+  to pick two anatomically reasonable end postures and linearly interpolate
+  between them to generate 20 different initial guesses, steering the solver
+  toward realistic poses without enforcing hard constraints. For the statics, we
+  used 4×4 homogeneous transformation matrices to chain the body together so
+  each segment's position and center of mass fell out of a single matrix
+  multiplication, then built the equilibrium equations into a 3×3 linear system
+  solved at every posture. To make sure the results held up, I added a sanity
+  check on the hip-force decomposition into compression and shear, plus a
+  base-of-support check on the body's center of mass to confirm each posture was
+  actually stable.
+image: /images/projects/spinal-loading-model/image.png
+gallery:
+  - /images/projects/spinal-loading-model/gallery/0.png
+  - /images/projects/spinal-loading-model/gallery/1.png
+  - /images/projects/spinal-loading-model/gallery/2.png
+tags:
+  - MATLAB
+  - Biomechanics
+  - Gait-Analysis
+  - Inverse-Kinematics
+  - Teamwork
+githubUrl: https://github.com/pmz96317peterziegler/Spinal-Loading.git
+date: 2026-05-01
+featured: true

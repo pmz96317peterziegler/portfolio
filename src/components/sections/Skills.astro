@@ -1,0 +1,89 @@
+---
+// Update this content via the Keystatic admin at /keystatic → Skills
+const categories = [
+  {
+    category: "CAD & Design",
+    items: ["Onshape", "AutoCAD LT", "Autodesk Inventor Pro"],
+  },
+  {
+    category: "Programming & Software",
+    items: ["Python", "MATLAB", "Arduino", "Node-Red", "Linux", "Microsoft Office"],
+  },
+  {
+    category: "Industrial Automation",
+    items: ["MQTT", "VT-Scada", "Modbus RTU", "Protocol Gateways", "PLC Wiring"],
+  },
+  {
+    category: "Fabrication",
+    items: ["MIG Welding", "Stick Welding", "Rapid Prototyping"],
+  },
+];
+---
+
+<section id="skills">
+  <div class="section-wrap reveal">
+    <div class="section-header">
+      <h2><span class="section-num">04.</span> Technical Skills</h2>
+      <span class="section-rule" aria-hidden="true"></span>
+    </div>
+
+    <div class="skills-grid reveal-group">
+      {categories.map(cat => (
+        <div class="skill-category">
+          <h3 class="cat-title">{cat.category}</h3>
+          <div class="cat-tags">
+            {cat.items.map(skill => (
+              <span class="skill-tag">{skill}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  @media (min-width: 640px) {
+    .skills-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .skill-category {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.5rem;
+  }
+
+  .cat-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin: 0 0 1rem;
+  }
+
+  .cat-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .skill-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35em 0.75em;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 0.825rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .skill-tag:hover { border-color: var(--accent); color: var(--text); }
+</style>

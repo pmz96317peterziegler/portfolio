@@ -1,0 +1,183 @@
+---
+import { getCollection } from 'astro:content';
+import { marked } from 'marked';
+import { fmt } from '../../utils/format';
+
+const entries = await getCollection('education');
+entries.sort((a, b) => {
+  const bTime = new Date(b.data.startDate).getTime();
+  const aTime = new Date(a.data.startDate).getTime();
+  return (isNaN(bTime) ? 0 : bTime) - (isNaN(aTime) ? 0 : aTime);
+});
+---
+
+<section id="education" style="background: var(--bg-subtle);">
+  <div class="section-wrap reveal">
+    <div class="section-header">
+      <h2><span class="section-num">05.</span> Education</h2>
+      <span class="section-rule" aria-hidden="true"></span>
+    </div>
+
+    <div class="edu-list">
+      {entries.map(entry => (
+        <div class="edu-item">
+          <div class="edu-meta">
+            <span class="edu-dates">
+              {fmt(entry.data.startDate)} — {fmt(entry.data.endDate)}
+            </span>
+          </div>
+          <div class="edu-content">
+            <div class="edu-degree-row">
+              <h3 class="edu-degree">
+                {entry.data.degree} in {entry.data.field}
+              </h3>
+              {entry.data.gpa && (
+                <span class="edu-gpa">GPA {entry.data.gpa}</span>
+              )}
+            </div>
+            {entry.data.minor && (
+              <p class="edu-minor">{entry.data.minor}</p>
+            )}
+            <p class="edu-institution">{entry.data.institution}</p>
+            {entry.data.description && (
+              <div class="edu-desc" set:html={marked.parse(entry.data.description)} />
+            )}
+            {entry.data.relevantCourses && entry.data.relevantCourses.length > 0 && (
+              <div class="edu-courses">
+                <p class="edu-courses-label">Relevant Coursework</p>
+                <ul class="edu-courses-list">
+                  {entry.data.relevantCourses.map(course => (
+                    <li class="course-tag">{course}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+
+      {entries.length === 0 && (
+        <p style="color: var(--text-faint); font-style: italic;">
+          Add education entries via the Keystatic admin at /keystatic
+        </p>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .edu-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .edu-item {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .edu-item:first-child { border-top: 1px solid var(--border); }
+
+  @media (min-width: 640px) {
+    .edu-item { grid-template-columns: 200px 1fr; gap: 2rem; align-items: start; }
+  }
+
+  .edu-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 0.25rem;
+  }
+
+  .edu-dates {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    display: block;
+  }
+
+  /* Degree row: title + GPA chip side by side */
+  .edu-degree-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .edu-degree {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .edu-gpa {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.67rem;
+    color: var(--accent);
+    background: var(--accent-light);
+    border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+    border-radius: 3px;
+    padding: 0.22em 0.6em;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .edu-minor {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin: 0 0 0.2rem;
+  }
+
+  .edu-institution {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--accent);
+    margin: 0 0 0.75rem;
+  }
+
+  .edu-desc {
+    font-size: 0.875rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+    max-width: 65ch;
+    margin: 0 0 1rem;
+  }
+  .edu-desc :global(p) { margin: 0 0 0.6rem; }
+  .edu-desc :global(p:last-child) { margin-bottom: 0; }
+  .edu-desc :global(ul) { list-style: disc; padding-left: 1.5rem; margin: 0.25rem 0 0.6rem; }
+  .edu-desc :global(li) { margin-bottom: 0.3rem; }
+  .edu-desc :global(strong) { color: var(--text); font-weight: 600; }
+
+  .edu-courses { margin-top: 0.25rem; }
+  .edu-courses-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+    margin: 0 0 0.6rem;
+  }
+  .edu-courses-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .course-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.67rem;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.2em 0.65em;
+  }
+</style>

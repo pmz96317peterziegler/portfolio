@@ -1,0 +1,67 @@
+---
+import { site } from '../../config/site';
+---
+
+<section id="home" class="hero">
+  <div class="hero-inner">
+    <p class="hero-greeting anim-1">{site.heroGreeting}</p>
+    <h1 class="hero-name anim-2">{site.name}.</h1>
+    <h2 class="hero-sub anim-3">{site.heroSubtitle}</h2>
+    <p class="hero-bio anim-4" set:html={site.heroBio} />
+  </div>
+</section>
+
+<style>
+  .hero {
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    padding-top: 70px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-inner {
+    max-width: 900px;
+    margin-inline: auto;
+    padding-inline: clamp(1.5rem, 5vw, 4rem);
+    padding-block: 5rem 6rem;
+  }
+
+  .hero-greeting {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+    color: var(--accent);
+    margin: 0 0 1.5rem;
+    letter-spacing: 0.02em;
+  }
+
+  .hero-name {
+    font-size: clamp(3.25rem, 9vw, 6.5rem);
+    font-weight: 700;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin: 0 0 1rem;
+  }
+
+  .hero-sub {
+    font-size: clamp(2rem, 5.5vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: var(--text-muted);
+    margin: 0 0 2.25rem;
+  }
+
+  .hero-bio {
+    font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+    line-height: 1.85;
+    color: var(--text-muted);
+    max-width: 54ch;
+    margin: 0;
+  }
+  .hero-bio strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+</style>

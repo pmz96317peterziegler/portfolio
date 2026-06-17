@@ -1,0 +1,42 @@
+title: Gait Analysis Model
+description: >
+  This project performs an inverse dynamics analysis on a person's leg during
+  gait, using marker motion capture data and ground reaction force measurements
+  to calculate the internal forces and moments at the ankle, knee, and hip
+  joints over time. I built a 2D model of the foot, leg, and thigh using
+  standard anthropometric data to set each segment's length, mass, and moment of
+  inertia from the subject's body weight. For each frame, the script tracks
+  segment angles and center-of-mass positions from the marker data, numerically
+  differentiates to get linear and angular velocities and accelerations, then
+  works up the chain from foot to hip applying Newton-Euler equations at each
+  joint. The output is a plot of joint moments versus time along with x and y
+  intersegmental forces at the ankle, knee, and hip, which together describe the
+  internal loading the body produces during the recorded motion.
+
+
+  The biggest challenge was that numerical differentiation amplifies noise
+  dramatically, so the raw marker data couldn't be differentiated twice without
+  producing wild accelerations. I handled this by applying a moving-average
+  filter to the raw marker positions and then again after each derivative step,
+  which kept the velocity and acceleration signals in a workable state. I also
+  wrote two helper functions for central difference differentiation, one for
+  paired x and y signals and one for single angular signals, which kept the main
+  script readable and made the velocity and acceleration calculations consistent
+  across all three segments. The other tricky part was getting the moment
+  equations right at each joint, since the sign of the moment arm depends on
+  which direction the segment's unit vector points and which end of the segment
+  the force is applied at. To build confidence in the results, I chained the
+  analysis from the ground up, using each joint's solved reaction force as the
+  input to the next segment so that any error would show up clearly in the
+  following plots.
+image: /images/projects/gait-analysis-model/image.png
+gallery:
+  - /images/projects/gait-analysis-model/gallery/0.png
+  - /images/projects/gait-analysis-model/gallery/1.png
+tags:
+  - Data-Analysis
+  - Kinematics
+  - Matlab
+  - Numerical-Methods
+githubUrl: https://github.com/pmz96317peterziegler/Gait-Analysis.git
+featured: true

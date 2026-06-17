@@ -1,0 +1,13 @@
+title: Object Avoiding Robot
+description: >-
+  Programmed an Arduino to receive sonar distance and direction signals,
+  translate them into avoidance regions, and navigate around obstacles
+  autonomously. Refined the detection algorithm to improve smoothness and
+  accuracy, resulting in a 25% increase in operating speed.
+gallery: []
+tags:
+  - Arduino
+  - Robotics
+  - Sensors
+date: 2025-01-01
+featured: false

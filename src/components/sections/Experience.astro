@@ -1,0 +1,261 @@
+---
+import { getCollection } from 'astro:content';
+import { marked } from 'marked';
+import { fmt } from '../../utils/format';
+
+const entries = await getCollection('experience');
+entries.sort((a, b) => {
+  const bTime = new Date(b.data.startDate).getTime();
+  const aTime = new Date(a.data.startDate).getTime();
+  return (isNaN(bTime) ? 0 : bTime) - (isNaN(aTime) ? 0 : aTime);
+});
+function dateRange(start: string, end?: string | null, current?: boolean) {
+  if (current) return `${fmt(start)} — Present`;
+  if (end)     return `${fmt(start)} — ${fmt(end)}`;
+  return fmt(start);
+}
+---
+
+<section id="experience">
+  <div class="section-wrap reveal">
+    <div class="section-header">
+      <h2><span class="section-num">02.</span> Where I've Worked</h2>
+      <span class="section-rule" aria-hidden="true"></span>
+    </div>
+
+    {entries.length > 0 ? (
+      <div class="exp-layout">
+        <ul class="tab-list" role="tablist" aria-label="Experience">
+          {entries.map((entry, i) => (
+            <li role="presentation">
+              <button
+                class={`tab-btn ${i === 0 ? 'active' : ''}`}
+                role="tab"
+                aria-selected={i === 0 ? 'true' : 'false'}
+                data-tab={entry.id}
+                tabindex={i === 0 ? '0' : '-1'}
+              >
+                {entry.data.logo && (
+                  <img src={entry.data.logo} alt="" class="tab-logo" aria-hidden="true" />
+                )}
+                {entry.data.company}
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <div class="tab-panels">
+          {entries.map((entry, i) => (
+            <div
+              class={`tab-panel ${i === 0 ? 'active' : ''}`}
+              role="tabpanel"
+              data-panel={entry.id}
+              hidden={i !== 0}
+            >
+              <h3 class="exp-role">
+                {entry.data.role}
+                <span class="exp-at"> @ </span>
+                <span class="exp-company-name">{entry.data.company}</span>
+              </h3>
+              <p class="exp-dates">
+                {dateRange(entry.data.startDate, entry.data.endDate, entry.data.current)}
+                {entry.data.current && <span class="exp-badge">Current</span>}
+              </p>
+              <div class="exp-desc" set:html={marked.parse(entry.data.description || '')} />
+              {entry.data.technologies && entry.data.technologies.length > 0 && (
+                <ul class="exp-tech">
+                  {entry.data.technologies.map(tech => <li class="tech-tag">{tech}</li>)}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    ) : (
+      <p style="color: var(--text-faint); font-style: italic;">
+        Add experience entries via the Keystatic admin at /keystatic
+      </p>
+    )}
+  </div>
+</section>
+
+<style>
+  .exp-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .exp-layout { grid-template-columns: 200px 1fr; }
+  }
+
+  .tab-list {
+    list-style: none;
+    margin: 0; padding: 0;
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    border-bottom: 2px solid var(--border);
+    scrollbar-width: none;
+  }
+  .tab-list::-webkit-scrollbar { display: none; }
+  @media (min-width: 640px) {
+    .tab-list {
+      flex-direction: column;
+      overflow-x: unset;
+      border-bottom: none;
+      border-left: 2px solid var(--border);
+      align-self: start;
+    }
+  }
+
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.9rem 1.25rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+    color: var(--text-faint);
+    cursor: pointer;
+    text-align: left;
+    white-space: nowrap;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .tab-logo {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    border-radius: 3px;
+    flex-shrink: 0;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+  }
+  .tab-btn:hover .tab-logo,
+  .tab-btn.active .tab-logo { opacity: 1; }
+  @media (min-width: 640px) {
+    .tab-btn {
+      border-bottom: none;
+      border-left: 2px solid transparent;
+      margin-bottom: 0;
+      margin-left: -2px;
+    }
+  }
+  .tab-btn:hover { color: var(--accent); background: var(--bg-subtle); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .tab-panels {
+    padding: 1.75rem 0;
+  }
+  @media (min-width: 640px) {
+    .tab-panels { padding: 0.25rem 0 0 2.5rem; }
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .exp-role {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.6rem;
+    line-height: 1.35;
+  }
+  .exp-at { color: var(--text-faint); font-weight: 400; }
+  .exp-company-name { color: var(--accent); }
+
+  .exp-dates {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.73rem;
+    color: var(--text-faint);
+    margin: 0 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .exp-badge {
+    padding: 0.12em 0.55em;
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 3px;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* Markdown-rendered description */
+  .exp-desc {
+    font-size: 0.925rem;
+    line-height: 1.85;
+    color: var(--text-muted);
+    max-width: 60ch;
+    margin: 0 0 1.25rem;
+  }
+  .exp-desc :global(p) { margin: 0 0 0.75rem; }
+  .exp-desc :global(p:last-child) { margin-bottom: 0; }
+  .exp-desc :global(ul) {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin: 0.25rem 0 0.75rem;
+  }
+  .exp-desc :global(li) { margin-bottom: 0.35rem; }
+  .exp-desc :global(strong) { color: var(--text); font-weight: 600; }
+
+  /* Technology tags */
+  .exp-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+  }
+  .tech-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.67rem;
+    color: var(--text-muted);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.2em 0.65em;
+  }
+</style>
+
+<script>
+  const tabBtns   = document.querySelectorAll<HTMLButtonElement>('.tab-btn');
+  const tabPanels = document.querySelectorAll<HTMLElement>('.tab-panel');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      tabBtns.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+        b.setAttribute('tabindex', '-1');
+      });
+      tabPanels.forEach(p => {
+        p.classList.remove('active');
+        p.setAttribute('hidden', '');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      btn.setAttribute('tabindex', '0');
+      const panel = document.querySelector<HTMLElement>(`[data-panel="${target}"]`);
+      if (panel) {
+        panel.classList.add('active');
+        panel.removeAttribute('hidden');
+      }
+    });
+  });
+</script>

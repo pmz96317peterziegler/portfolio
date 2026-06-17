@@ -1,0 +1,32 @@
+company: Southern Flow
+role: Automation Engineering Intern
+startDate: 2025-05-01
+endDate: 2025-08-31
+current: false
+description: >
+  - Designed the mechanical and pneumatic systems for an glycerin fill station
+  for pressure-gauge diaphragm seals, then
+
+  tested a prototype projected to cut subcontracted labor and cost by 40%.
+
+  - Built and deployed a pilot Remote Telemetry Unit transmitting temperature
+  and humidity data over MQTT, then
+
+  documented the full fabrication, integration, and configuration so the design
+  could be replicated across sites.
+
+  - Produced AutoCAD wiring diagrams mapping Allen-Bradley PLC I/O cards for
+  four customer installations, translating
+
+  field wiring into clear, standardized schematics.
+
+  - Configured an Advantech protocol gateway converting Modbus RTU (RS-485) to
+  Modbus TCP, allowing legacy equipment to communicate with modern
+  Ethernet-based control systems.
+technologies:
+  - MQTT
+  - Onshape
+  - Autocad-LT
+  - Node-Red
+  - Vt-SCADA
+logo: /images/logos/southern-flow/logo.png

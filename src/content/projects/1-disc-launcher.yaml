@@ -1,0 +1,42 @@
+title: Disc Launcher
+description: >
+  I worked with a team of five other student engineers to design and build a
+  ballista-style launcher for a class project. My role focused on fabrication
+  and performance testing, including building out the wooden frame and trigger
+  mechanism and running the iteration cycles that pushed the launcher toward its
+  final performance. The original goal was to launch a disc, but the disk was
+  very light and flimsy, which meant that it was susceptible to very small
+  changes in wind and would additionally deform substantially when shot from any
+  powerful device. So the team and I made the call to embed the disc into a more
+  aerodynamically stable dart-style projectile instead. That pivot ended up
+  being the single biggest contributor to performance for the project and
+  reframed how we approached the rest of the testing. 
+
+
+  The trickiest piece was the trigger mechanism. We started with a medieval
+  crossbow design as our reference, but translating that geometry into something
+  that actually held up under our tension loads took several iterations. Early
+  versions snapped under load, the string holder kept bending or slipping out of
+  place, and getting the two contact pieces to mate cleanly enough for a
+  consistent release was challenging. Each failure mode forced us to rethink
+  either the material, the geometry, or the fit between the parts. Once the
+  trigger finally released cleanly and predictably, our test data actually
+  became relevant, since we could tell whether a distance change came from a
+  design tweak or from a bad release. From there I ran iterative testing on dart
+  geometry and launch angle, adjusting one variable at a time across multiple
+  test sessions until we landed on a combination that pushed launch distance up
+  by roughly 30% over our baseline. 
+image: /images/projects/1-disc-launcher/image.PNG
+gallery:
+  - /images/projects/1-disc-launcher/gallery/0.PNG
+  - /images/projects/1-disc-launcher/gallery/1.png
+  - /images/projects/1-disc-launcher/gallery/2.png
+  - /images/projects/1-disc-launcher/gallery/3.JPG
+tags:
+  - CAD
+  - Fabrication
+  - Prototyping
+  - Mechanical Design
+  - Teamwork
+date: 2025-12-01
+featured: true

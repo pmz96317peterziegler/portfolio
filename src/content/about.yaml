@@ -1,0 +1,19 @@
+headline: peter-ziegler
+bio: >-
+  I absolutely love robotics and automation — the idea that code can move real
+  things in the physical world is endlessly exciting. I'm a Mechanical
+  Engineering student at the University of Georgia, and I've spent my college
+  years trying to close the gap between textbook physics and real-world systems.
+
+
+  Something that really drives me: systems that work end-to-end. Whether that's
+  a Python-based inverse kinematics solver for a 6-DOF arm, an MQTT telemetry
+  network for an industrial site, or an autonomous robot navigating obstacles —
+  I care about the full stack from sensor to actuator. Outside of engineering I
+  volunteer with the Brooklyn Cemetery restoration project in Athens.
+
+
+  I'm always looking for opportunities to work on meaningful engineering
+  problems. Feel free to reach out if you'd like to build something together!
+photo: /images/photo.jpg
+resumeUrl: /resume/resumePdf.pdf

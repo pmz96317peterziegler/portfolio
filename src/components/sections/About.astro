@@ -1,0 +1,147 @@
+---
+import { site } from '../../config/site';
+---
+
+<section id="about" style="background: var(--bg-subtle);">
+  <div class="section-wrap reveal">
+    <div class="section-header">
+      <h2><span class="section-num">01.</span> About Me</h2>
+      <span class="section-rule" aria-hidden="true"></span>
+    </div>
+
+    <div class="about-grid">
+      <div class="about-text">
+        <div class="bio-body">
+          {site.bio.map(para => <p set:html={para} />)}
+        </div>
+
+      </div>
+
+      <div class="about-photo-wrap">
+        <div class="photo-frame">
+          {site.photo
+            ? <img src={site.photo} alt={site.name} data-lightbox="true" data-lightbox-group="about" />
+            : <div class="photo-placeholder">
+                <span>PZ</span>
+                <p>Add photo in<br /><code>src/config/site.ts</code></p>
+              </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+    align-items: start;
+  }
+  @media (min-width: 768px) {
+    .about-grid {
+      grid-template-columns: 1fr auto;
+      gap: 5rem;
+    }
+  }
+
+  .about-text { max-width: 560px; }
+
+  .bio-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .bio-body p {
+    font-size: 1rem;
+    line-height: 1.9;
+    color: var(--text-muted);
+  }
+  .bio-body strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* Photo with Mayank-style offset border */
+  .about-photo-wrap {
+    display: flex;
+    justify-content: center;
+  }
+  @media (min-width: 768px) {
+    .about-photo-wrap { justify-content: flex-end; }
+  }
+
+  .photo-frame {
+    position: relative;
+    width: clamp(200px, 28vw, 280px);
+    aspect-ratio: 3 / 4;
+    border-radius: 4px;
+    overflow: visible;
+    flex-shrink: 0;
+  }
+  /* Offset accent border behind the photo */
+  .photo-frame::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    z-index: 0;
+    transition: top 0.3s ease, left 0.3s ease;
+  }
+  .photo-frame:hover::after {
+    top: 8px;
+    left: 8px;
+  }
+
+  .photo-frame img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+    filter: grayscale(15%);
+    transition: filter 0.3s ease;
+  }
+  .photo-frame:hover img { filter: none; }
+
+  .photo-placeholder {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .photo-placeholder span {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--border-strong);
+    letter-spacing: -0.03em;
+  }
+  .photo-placeholder p {
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    line-height: 1.6;
+    margin: 0;
+  }
+  .photo-placeholder code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+  }
+</style>

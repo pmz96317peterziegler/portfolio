@@ -1,0 +1,44 @@
+title: Inverse Kinematics Solver
+description: >-
+  This project builds a numerical inverse kinematics solver for a 6-DOF UR5
+  robotic arm. Given a desired position and orientation for the end-effector,
+  the solver finds the six joint angles that put the arm there. I described the
+  robot's geometry using a standard Denavit-Hartenberg parameter table, then
+  wrote a forward kinematics routine that chains the six joint transforms
+  together to compute where the end-effector currently is for any set of joint
+  angles. The IK solver is iterative: at each step it computes the 6D error
+  between the current and target poses, builds the Jacobian matrix that relates
+  joint velocities to end-effector velocities, and uses that relationship to
+  figure out a small joint update that should reduce the error. Repeat until the
+  error drops below a tolerance. To validate it, I plugged the output joint
+  angles into a CoppeliaSim UR5 model and confirmed the simulated arm lands at
+  the desired pose.
+
+
+  The two parts I found most interesting to work through were the orientation
+  error and the step size. Position error is easy because you can subtract two
+  3D vectors, but orientation error needs more thought since you can't subtract
+  two rotation matrices in a meaningful way. I computed the rotation that takes
+  the current orientation to the target, then pulled the rotation angle out
+  using the trace of that matrix and the rotation axis out of its off-diagonal
+  entries. That gave me a single 3D vector representing "how much to rotate, and
+  around what axis" that fits into the same error format as position. The step
+  size turned out to be more intresting than I expected. The full Newton step is
+  fast near the solution but can overshoot when you're far from it, so scaling
+  each update by a fraction makes the solver more stable at the cost of more
+  iterations. I tested several values and plotted the convergence behavior. The
+  full step converged in 9 iterations but bounced around at one point along the
+  way, while smaller steps were slower but near completely linear.
+image: /images/projects/inverse-kinematics-solver/image.JPG
+gallery:
+  - /images/projects/inverse-kinematics-solver/gallery/0.png
+  - /images/projects/inverse-kinematics-solver/gallery/1.png
+tags:
+  - Python
+  - Robotics
+  - Kinematics
+  - Simulation
+  - Numerical-Methods
+githubUrl: https://github.com/pmz96317peterziegler/DH-Inverse-Kinematics.git
+date: 2026-01-01
+featured: true

@@ -1,0 +1,216 @@
+<div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <div id="lb-backdrop" class="lb-backdrop"></div>
+  <button id="lb-close" class="lb-close" aria-label="Close">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+  <button id="lb-prev" class="lb-nav lb-prev" aria-label="Previous image">
+    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+    </svg>
+  </button>
+  <button id="lb-next" class="lb-nav lb-next" aria-label="Next image">
+    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+    </svg>
+  </button>
+  <div class="lb-content">
+    <img id="lb-img" src="" alt="" />
+    <p id="lb-caption" class="lb-caption"></p>
+    <p id="lb-counter" class="lb-counter"></p>
+  </div>
+</div>
+
+<style is:global>
+  [data-lightbox] { cursor: zoom-in; }
+</style>
+
+<style>
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+  .lightbox.open { display: flex; }
+
+  .lb-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 12, 5, 0.95);
+    cursor: zoom-out;
+  }
+
+  .lb-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.875rem;
+    max-width: min(90vw, 1200px);
+  }
+
+  #lb-img {
+    max-width: 100%;
+    max-height: 82vh;
+    object-fit: contain;
+    border-radius: 4px;
+    display: block;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+  }
+
+  .lb-caption {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.75);
+    letter-spacing: 0.04em;
+    margin: 0;
+    text-align: center;
+    max-width: 60ch;
+  }
+
+  .lb-counter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.15em;
+    margin: 0;
+  }
+
+  .lb-close {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 2;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(30, 18, 8, 0.5);
+    color: rgba(255, 255, 255, 0.65);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .lb-close:hover {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.45);
+    background: rgba(30, 18, 8, 0.8);
+  }
+
+  .lb-nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(30, 18, 8, 0.5);
+    color: rgba(255, 255, 255, 0.65);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s;
+  }
+  .lb-nav:hover {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.45);
+    background: rgba(30, 18, 8, 0.8);
+    transform: translateY(calc(-50% - 2px));
+  }
+  .lb-prev { left: 1.25rem; }
+  .lb-next { right: 1.25rem; }
+
+  @media (max-width: 640px) {
+    .lb-prev { left: 0.5rem; }
+    .lb-next { right: 0.5rem; }
+    .lb-nav { width: 2.25rem; height: 2.25rem; }
+  }
+</style>
+
+<script>
+  const lb         = document.getElementById('lightbox')!;
+  const lbImg      = document.getElementById('lb-img') as HTMLImageElement;
+  const lbCaption  = document.getElementById('lb-caption')!;
+  const lbCounter  = document.getElementById('lb-counter')!;
+  const lbClose    = document.getElementById('lb-close')!;
+  const lbPrev     = document.getElementById('lb-prev')!;
+  const lbNext     = document.getElementById('lb-next')!;
+  const lbBackdrop = document.getElementById('lb-backdrop')!;
+
+  let currentGroup: HTMLImageElement[] = [];
+  let currentIndex = 0;
+
+  function openLightbox(imgs: HTMLImageElement[], index: number) {
+    currentGroup = imgs;
+    currentIndex = index;
+    render();
+    lb.classList.add('open');
+    lb.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    lbClose.focus();
+  }
+
+  function render() {
+    const img = currentGroup[currentIndex];
+    lbImg.src = img.src;
+    lbImg.alt = img.alt;
+    const caption = img.dataset.caption || '';
+    lbCaption.textContent = caption;
+    lbCaption.style.display = caption ? '' : 'none';
+    const multi = currentGroup.length > 1;
+    lbPrev.style.display = multi ? '' : 'none';
+    lbNext.style.display = multi ? '' : 'none';
+    lbCounter.textContent = multi ? `${currentIndex + 1} / ${currentGroup.length}` : '';
+  }
+
+  function close() {
+    lb.classList.remove('open');
+    lb.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function prev() {
+    currentIndex = (currentIndex - 1 + currentGroup.length) % currentGroup.length;
+    render();
+  }
+
+  function next() {
+    currentIndex = (currentIndex + 1) % currentGroup.length;
+    render();
+  }
+
+  document.addEventListener('click', (e) => {
+    const img = (e.target as HTMLElement).closest('[data-lightbox]') as HTMLImageElement | null;
+    if (!img) return;
+    const group = img.dataset.lightboxGroup;
+    if (group) {
+      const imgs = Array.from(document.querySelectorAll<HTMLImageElement>(`[data-lightbox-group="${group}"]`));
+      openLightbox(imgs, Math.max(0, imgs.indexOf(img)));
+    } else {
+      openLightbox([img], 0);
+    }
+  });
+
+  lbClose.addEventListener('click', close);
+  lbBackdrop.addEventListener('click', close);
+  lbPrev.addEventListener('click',  (e) => { e.stopPropagation(); prev(); });
+  lbNext.addEventListener('click',  (e) => { e.stopPropagation(); next(); });
+
+  document.addEventListener('keydown', (e) => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape')     close();
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); prev(); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+  });
+</script>
