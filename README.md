@@ -34,6 +34,8 @@ git commit -m "your message"
 git push
 ```
 
+> Run each line separately in PowerShell — `&&` does not work in PowerShell.
+
 Vercel picks it up and goes live in ~1 minute.
 
 ---
@@ -42,3 +44,16 @@ Vercel picks it up and goes live in ~1 minute.
 
 Drop files into `public/images/` and reference them as `/images/filename.jpg`.  
 For project galleries, use Keystatic to upload — it handles the paths for you.
+
+---
+
+## What still needs work
+
+**High priority (recruiters will notice):**
+- Skills section — currently empty, fill it in via Keystatic
+- GitHub links on projects — repos exist, just add the URLs in Keystatic
+- Object Avoiding Robot and Inverted Pendulum Table descriptions — very short compared to featured projects
+
+**Nice to have:**
+- Custom domain (e.g. `peterziegler.dev`) — buy on Namecheap/Cloudflare (~$12/yr), add in Vercel → Settings → Domains
+- OG image — replace `public/og-image.png` with a real social preview image
