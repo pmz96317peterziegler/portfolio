@@ -1,0 +1,31 @@
+company: UGA Circuits TA
+role: Teachers Assistant
+startDate: 2026-05-18
+current: true
+description: >-
+  - Helping a professor scale a non-majors circuits course from ∼40 to ∼175
+  students by co-developing a library of 13
+
+  hands-on demo videos that connect circuit theory to real-world electronics.
+
+  - Built demonstrations spanning appliance and motor teardowns (identifying
+  transformers, capacitors, and
+
+  armature/stator components), RL/RC low-pass filters with phase-difference
+  measurement, and a modeling of computer memory using digital logic.
+
+  - Independently created a class A/B audio amplifier PCB, and produced a full
+  KiCAD PCB design-and-fabrication walkthrough.
+technologies:
+  - Soldering
+  - KiCad
+  - PCB Design
+logo: /images/logos/uga-circuits-ta/logo.jpeg
+videos:
+  - /videos/experience/uga-circuits-ta/videos/0.mp4
+  - /videos/experience/uga-circuits-ta/videos/1.mp4
+gallery:
+  - /images/experience/uga-circuits-ta/gallery/0.png
+  - /images/experience/uga-circuits-ta/gallery/1.jpg
+  - null
+  - /images/experience/uga-circuits-ta/gallery/3.png

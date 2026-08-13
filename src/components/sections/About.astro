@@ -1,5 +1,11 @@
 ---
-import { site } from '../../config/site';
+import { getEntry } from 'astro:content';
+import { marked } from 'marked';
+
+const about = (await getEntry('about', 'about'))?.data;
+const site = (await getEntry('site', 'site'))?.data;
+
+const bioHtml = about?.bio ? (marked.parse(about.bio) as string) : '';
 ---
 
 <section id="about" style="background: var(--bg-subtle);">
@@ -11,19 +17,16 @@ import { site } from '../../config/site';
 
     <div class="about-grid">
       <div class="about-text">
-        <div class="bio-body">
-          {site.bio.map(para => <p set:html={para} />)}
-        </div>
-
+        <div class="bio-body" set:html={bioHtml} />
       </div>
 
       <div class="about-photo-wrap">
         <div class="photo-frame">
-          {site.photo
-            ? <img src={site.photo} alt={site.name} data-lightbox="true" data-lightbox-group="about" />
+          {about?.photo
+            ? <img src={about.photo} alt={site?.name ?? 'Portrait'} data-lightbox="true" data-lightbox-group="about" />
             : <div class="photo-placeholder">
                 <span>PZ</span>
-                <p>Add photo in<br /><code>src/config/site.ts</code></p>
+                <p>Add a photo in<br /><code>/keystatic → About Me</code></p>
               </div>
           }
         </div>
@@ -53,12 +56,14 @@ import { site } from '../../config/site';
     flex-direction: column;
     gap: 1.25rem;
   }
-  .bio-body p {
+  /* :global — this content comes from marked via set:html, so it carries no
+     Astro scope attribute and a plain descendant selector would never match. */
+  .bio-body :global(p) {
     font-size: 1rem;
     line-height: 1.9;
     color: var(--text-muted);
   }
-  .bio-body strong {
+  .bio-body :global(strong) {
     color: var(--text);
     font-weight: 600;
   }

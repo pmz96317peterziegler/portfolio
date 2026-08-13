@@ -1,12 +1,14 @@
 ---
-import { site } from '../config/site';
+import { getEntry } from 'astro:content';
+
+const site = (await getEntry('site', 'site'))?.data;
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
   <div class="footer-inner">
     <p class="footer-copy">
-      Designed &amp; Built by {site.name}
+      Designed &amp; Built by {site?.name}
     </p>
     <p class="footer-year">© {year}</p>
   </div>

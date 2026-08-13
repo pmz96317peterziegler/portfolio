@@ -1,19 +1,20 @@
-headline: peter-ziegler
 bio: >-
-  I absolutely love robotics and automation — the idea that code can move real
-  things in the physical world is endlessly exciting. I'm a Mechanical
-  Engineering student at the University of Georgia, and I've spent my college
-  years trying to close the gap between textbook physics and real-world systems.
+  The thing I keep chasing is the **gap between an idea and a working version of
+  it**. I'm a Mechanical Engineering student at the **University of Georgia**,
+  and what I enjoy most is taking a complex system and finding the math that
+  describes it, whether that's the forces on someone's spine during a lift, the
+  motion of a person's joints through a stride, or the kinematics of a robotic
+  arm. I like that the modeling isn't the end of it. A model is only convincing
+  once it survives contact with reality.
 
 
-  Something that really drives me: systems that work end-to-end. Whether that's
-  a Python-based inverse kinematics solver for a 6-DOF arm, an MQTT telemetry
-  network for an industrial site, or an autonomous robot navigating obstacles —
-  I care about the full stack from sensor to actuator. Outside of engineering I
-  volunteer with the Brooklyn Cemetery restoration project in Athens.
-
-
-  I'm always looking for opportunities to work on meaningful engineering
-  problems. Feel free to reach out if you'd like to build something together!
+  That's the part I care about: not letting any of it stay abstract. At some
+  point the code has to run, the math models reality correctly, and the part has
+  to come off the **3D printing bed** or weld up straight, and that step is
+  where I do most of my learning. I'm just as interested in **deriving the
+  equations** as I am in **building the physical piece**, and I like robotics
+  specifically because it forces both at once. Outside of engineering I love
+  powerlifting and volunteering at the Brooklyn Cemetery restoration project in
+  Athens.
 photo: /images/photo.jpg
-resumeUrl: /resume/resumePdf.pdf
+resumePdf: /resume/resumePdf.pdf

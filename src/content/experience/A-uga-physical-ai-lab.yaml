@@ -1,0 +1,31 @@
+company: UGA Physical AI Lab
+role: Undergraduate Research Assistant
+startDate: 2026-01-01
+current: true
+description: >-
+  - Fine-tuned Vision-Language-Action (VLA) models on 400+ teleoperated robot
+  trajectories across 4 dataset
+
+  configurations to measure how subtask decomposition affects task-completion
+  accuracy.
+
+  - Designed a controlled data-collection protocol isolating lighting and
+  background variables, improving model success
+
+  rate by an estimated 45%.
+
+  - Designed and 3D-printed a custom end effector that expanded grippable
+  surface area 150%, producing more
+
+  consistent grasps in manipulation trials.
+technologies:
+  - FDM 3d Printing
+  - Onshape
+  - Robotics
+  - LeRobot
+logo: /images/logos/A-uga-physical-ai-lab/logo.jpeg
+videos:
+  - /videos/experience/A-uga-physical-ai-lab/videos/0.mp4
+gallery:
+  - /images/experience/A-uga-physical-ai-lab/gallery/0.jpg
+  - /images/experience/A-uga-physical-ai-lab/gallery/1.jpg

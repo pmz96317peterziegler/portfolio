@@ -1,13 +1,19 @@
 ---
-import { site } from '../../config/site';
+import { getEntry } from 'astro:content';
+import { marked } from 'marked';
+
+const home = (await getEntry('home', 'home'))?.data;
+const site = (await getEntry('site', 'site'))?.data;
+
+const introHtml = home?.intro ? (marked.parse(home.intro) as string) : '';
 ---
 
 <section id="home" class="hero">
   <div class="hero-inner">
-    <p class="hero-greeting anim-1">{site.heroGreeting}</p>
-    <h1 class="hero-name anim-2">{site.name}.</h1>
-    <h2 class="hero-sub anim-3">{site.heroSubtitle}</h2>
-    <p class="hero-bio anim-4" set:html={site.heroBio} />
+    {home?.greeting && <p class="hero-greeting anim-1">{home.greeting}</p>}
+    <h1 class="hero-name anim-2">{site?.name}.</h1>
+    {home?.subtitle && <h2 class="hero-sub anim-3">{home.subtitle}</h2>}
+    {introHtml && <div class="hero-bio anim-4" set:html={introHtml} />}
   </div>
 </section>
 
@@ -60,7 +66,11 @@ import { site } from '../../config/site';
     max-width: 54ch;
     margin: 0;
   }
-  .hero-bio strong {
+  /* :global — this content comes from marked via set:html, so it carries no
+     Astro scope attribute and a plain descendant selector would never match. */
+  .hero-bio :global(p) { margin: 0; }
+  .hero-bio :global(p + p) { margin-top: 1.15rem; }
+  .hero-bio :global(strong) {
     color: var(--text);
     font-weight: 600;
   }

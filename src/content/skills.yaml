@@ -1,0 +1,29 @@
+categories:
+  - category: CAD & Design
+    items:
+      - Onshape
+      - AutoCAD LT
+      - Autodesk Inventor Pro
+      - KiCad
+  - category: Programming & Software
+    items:
+      - Python
+      - MATLAB
+      - Arduino
+      - Node-Red
+      - Linux
+      - Microsoft Office
+  - category: Industrial Automation
+    items:
+      - MQTT
+      - VT-Scada
+      - Modbus RTU
+      - Protocol Gateways
+      - PLC Wiring
+  - category: Fabrication
+    items:
+      - MIG Welding
+      - Stick Welding
+      - Rapid Prototyping
+      - FDM Printing
+      - Soldering

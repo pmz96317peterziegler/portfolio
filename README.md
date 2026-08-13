@@ -12,15 +12,27 @@ Opens at **http://localhost:4321** — the browser updates automatically when yo
 
 ## Editing content
 
-### Projects, Experience, Education
-Open **http://localhost:4321/keystatic** while the dev server is running.  
-This is the visual editor — add entries, upload images, and fill in fields there.
+Everything is edited at **http://localhost:4321/keystatic** while the dev server is running. Nothing needs to be edited in VS Code.
 
-### Bio, hero text, links (GitHub, LinkedIn, email)
-Edit **`src/config/site.ts`** directly and save. The browser hot-reloads instantly.
+The admin sidebar is grouped:
+
+**Page Content**
+- **Home / Intro Section** — the greeting line, big tagline, and intro paragraph
+- **About Me Section** — your bio, your photo, and your resume PDF
+- **Technical Skills** — skill categories and the skills inside them
+- **Contact Section** — the closing paragraph, LinkedIn, GitHub, and email
+
+**Lists**
+- **Work Experience**, **Projects**, **Education** — multiple entries each
+
+**Global**
+- **Site & SEO** — your name, your title, and the description Google shows
 
 ### Resume PDF
-Go to Keystatic → **About** → paste a public link to your resume (Google Drive, Dropbox, or a file path like `/resume/resumePdf.pdf` if you dropped the file in `public/resume/`).
+Keystatic → **About Me Section** → **Resume (PDF)** → upload the file. Uploading a new one replaces the old. Clear the field to hide the Resume button in the nav.
+
+### Formatting text
+The bio and intro boxes support markdown: wrap text in `**double asterisks**` to bold it, and leave a blank line between paragraphs.
 
 ---
 

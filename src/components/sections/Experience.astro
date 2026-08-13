@@ -3,11 +3,19 @@ import { getCollection } from 'astro:content';
 import { marked } from 'marked';
 import { fmt } from '../../utils/format';
 
-const entries = await getCollection('experience');
-entries.sort((a, b) => {
+const rawEntries = await getCollection('experience');
+rawEntries.sort((a, b) => {
   const bTime = new Date(b.data.startDate).getTime();
   const aTime = new Date(a.data.startDate).getTime();
   return (isNaN(bTime) ? 0 : bTime) - (isNaN(aTime) ? 0 : aTime);
+});
+
+const entries = rawEntries.map(entry => {
+  const photos = (entry.data.gallery || []).filter((s): s is string => s != null);
+  const videos = (entry.data.videos || []).filter((s): s is string => s != null);
+  // Only photos live in the right-hand column, so only photos trigger the
+  // two-column grid. Videos sit under the bullets in the wide left column.
+  return { ...entry, photos, videos, hasPhotos: photos.length > 0 };
 });
 function dateRange(start: string, end?: string | null, current?: boolean) {
   if (current) return `${fmt(start)} — Present`;
@@ -50,7 +58,7 @@ function dateRange(start: string, end?: string | null, current?: boolean) {
               class={`tab-panel ${i === 0 ? 'active' : ''}`}
               role="tabpanel"
               data-panel={entry.id}
-              hidden={i !== 0}
+              inert={i !== 0 ? true : undefined}
             >
               <h3 class="exp-role">
                 {entry.data.role}
@@ -61,7 +69,74 @@ function dateRange(start: string, end?: string | null, current?: boolean) {
                 {dateRange(entry.data.startDate, entry.data.endDate, entry.data.current)}
                 {entry.data.current && <span class="exp-badge">Current</span>}
               </p>
-              <div class="exp-desc" set:html={marked.parse(entry.data.description || '')} />
+              <div class={`exp-main ${entry.hasPhotos ? 'has-photos' : ''}`}>
+                <div class="exp-body">
+                  <div class="exp-desc" set:html={marked.parse(entry.data.description || '')} />
+
+                  {entry.videos.length > 0 && (
+                    <div class="exp-videos">
+                      {entry.videos.map((src, vi) => (
+                        <video
+                          src={src}
+                          class="exp-video"
+                          autoplay
+                          loop
+                          muted
+                          playsinline
+                          preload="metadata"
+                          aria-label={`${entry.data.company} clip ${vi + 1}`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {entry.hasPhotos && (
+                  <div class="exp-media">
+                    <div class="exp-media-main">
+                      <div class="exp-carousel">
+                        <div class="exp-track" data-track>
+                          {entry.photos.map((src, pi) => (
+                            <div class="exp-slide">
+                              <img
+                                src={src}
+                                alt={`${entry.data.company} — photo ${pi + 1}`}
+                                class="exp-photo"
+                                data-lightbox="true"
+                                data-lightbox-group={`exp-${entry.id}`}
+                                loading="lazy"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {entry.photos.length > 1 && (
+                        <div class="exp-dots">
+                          {entry.photos.map((_, pi) => (
+                            <button
+                              type="button"
+                              class={`exp-dot ${pi === 0 ? 'active' : ''}`}
+                              data-dot={pi}
+                              aria-label={`Show photo ${pi + 1}`}
+                              aria-current={pi === 0 ? 'true' : 'false'}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {entry.photos.length > 1 && (
+                      <button type="button" class="exp-arrow" data-step="1" aria-label="Next photo">
+                        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
               {entry.data.technologies && entry.data.technologies.length > 0 && (
                 <ul class="exp-tech">
                   {entry.data.technologies.map(tech => <li class="tech-tag">{tech}</li>)}
@@ -154,15 +229,55 @@ function dateRange(start: string, end?: string | null, current?: boolean) {
     background: var(--accent-light);
   }
 
+  /* Panels are stacked absolutely so the outgoing and incoming ones can
+     cross-fade. That takes them out of flow, so the container has no height of
+     its own — the script sets it from the active panel and transitions it,
+     which is what stops the page jumping when roles have different lengths. */
   .tab-panels {
-    padding: 1.75rem 0;
-  }
-  @media (min-width: 640px) {
-    .tab-panels { padding: 0.25rem 0 0 2.5rem; }
+    position: relative;
+    transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
+  /* Padding lives on the panel, not the container. An absolutely positioned
+     child is laid out against the containing block's PADDING box, so padding on
+     .tab-panels would be ignored here and the text would sit under the tabs. */
+  .tab-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1.75rem 0;
+    opacity: 0;
+    /* --slide-from is flipped per direction by the script */
+    transform: translateX(var(--slide-from, 24px));
+    pointer-events: none;
+    transition:
+      opacity   0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (min-width: 640px) {
+    .tab-panel { padding: 0.25rem 0 0 2.5rem; }
+  }
+  .tab-panel.active {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  /* Until the script sets an explicit height, keep the active panel in flow so
+     the section still has height for no-JS visitors. */
+  .tab-panels:not([data-ready]) .tab-panel.active {
+    position: relative;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tab-panels { transition: none; }
+    .tab-panel {
+      transform: none;
+      transition: opacity 0.15s linear;
+    }
+    .exp-track { transition: none; }
+  }
 
   .exp-role {
     font-size: 1.1rem;
@@ -192,6 +307,144 @@ function dateRange(start: string, end?: string | null, current?: boolean) {
     border-radius: 3px;
     font-size: 0.65rem;
     letter-spacing: 0.05em;
+  }
+
+  /* Description (+ videos) on the left, photo carousel on the right.
+     Stays a plain block when there are no photos, so those entries render
+     exactly as they did before this column existed. Only photos trigger the
+     grid — videos live in the left column under the bullets. */
+  .exp-main { display: block; }
+
+  @media (min-width: 900px) {
+    .exp-main.has-photos {
+      display: grid;
+      /* Size the PHOTO column explicitly and let the text take what's left.
+         Sizing the text track in ch instead collapses this column to 0 — ch
+         resolves against the grid container's font, not .exp-desc's smaller
+         one, so 60ch overruns the whole panel. */
+      /* Widened over the photo's own width to make room for the arrow track,
+         so adding arrows did not shrink the image. */
+      grid-template-columns: minmax(0, 1fr) clamp(200px, 28%, 285px);
+      gap: 2rem;
+      align-items: start;
+    }
+  }
+
+  /* ── Videos: divide the text column evenly ──
+     auto-fit collapses unused tracks, so one clip stretches the full width,
+     two split it in half, three take a third each. The 140px floor is the only
+     safety valve — past roughly four clips they wrap to a second row instead
+     of shrinking to unwatchable slivers, and every row keeps equal widths
+     (which a flex row does not). */
+  .exp-videos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin: 0.25rem 0 1.25rem;
+  }
+  .exp-video {
+    width: 100%;
+    min-width: 0;
+    /* Clips come in mixed shapes (square, portrait, landscape), so `contain`
+       shows each one whole instead of cropping the tall ones to fit. Any
+       leftover space fills with --bg-subtle, which reads as part of the card
+       rather than as the black bars a letterboxed video would show. */
+    aspect-ratio: 4 / 3;
+    object-fit: contain;
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-subtle);
+  }
+
+  /* ── Photo carousel ──
+     The arrow sits beside the photo rather than over it, so it never covers
+     the image and never trips the lightbox. It cycles forward and wraps, so a
+     single control reaches every photo. */
+  .exp-media {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+  }
+  .exp-media-main { flex: 1 1 auto; min-width: 0; }
+
+  .exp-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--bg-card);
+    color: var(--text-faint);
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .exp-arrow:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-light);
+    transform: translateX(2px);
+  }
+
+  @media (max-width: 899px) {
+    .exp-media { max-width: 320px; margin-top: 1.25rem; }
+  }
+
+  .exp-carousel {
+    overflow: hidden;
+    border-radius: 4px;
+  }
+  .exp-track {
+    display: flex;
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .exp-slide {
+    flex: 0 0 100%;
+    min-width: 0;
+  }
+  /* Fixed ratio keeps the column from changing height between mixed
+     portrait/landscape uploads — same reasoning as the Projects thumbnails
+     at Projects.astro:322. The lightbox shows the uncropped original. */
+  .exp-photo {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-subtle);
+    transition: border-color 0.2s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .exp-photo:hover {
+    border-color: var(--accent);
+    transform: scale(1.02);
+  }
+
+  .exp-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-top: 0.7rem;
+  }
+  .exp-dot {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border-radius: 50%;
+    border: none;
+    background: var(--border-strong);
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .exp-dot:hover { background: var(--text-faint); }
+  .exp-dot.active {
+    background: var(--accent);
+    transform: scale(1.35);
   }
 
   /* Markdown-rendered description */
@@ -233,12 +486,69 @@ function dateRange(start: string, end?: string | null, current?: boolean) {
 </style>
 
 <script>
-  const tabBtns   = document.querySelectorAll<HTMLButtonElement>('.tab-btn');
-  const tabPanels = document.querySelectorAll<HTMLElement>('.tab-panel');
+  const panelsWrap = document.querySelector<HTMLElement>('.tab-panels');
+  const tabBtns    = Array.from(document.querySelectorAll<HTMLButtonElement>('.tab-btn'));
+  const tabPanels  = Array.from(document.querySelectorAll<HTMLElement>('.tab-panel'));
 
-  tabBtns.forEach(btn => {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  // ── Panel height ───────────────────────────────────────────────
+  // Panels are absolutely positioned so they can cross-fade, which leaves the
+  // container with no intrinsic height. Drive it from the active panel and let
+  // CSS transition it, so switching between a long and short role glides.
+  function activePanel() {
+    return tabPanels.find(p => p.classList.contains('active')) ?? null;
+  }
+
+  function syncHeight() {
+    const panel = activePanel();
+    if (!panelsWrap || !panel) return;
+    panelsWrap.style.height = `${panel.offsetHeight}px`;
+  }
+
+  // Images and videos change a panel's height after first paint, and the
+  // carousel/text reflow on resize — re-measure rather than trusting one read.
+  const ro = new ResizeObserver(syncHeight);
+  tabPanels.forEach(p => ro.observe(p));
+  window.addEventListener('resize', syncHeight);
+
+  if (panelsWrap) {
+    panelsWrap.setAttribute('data-ready', '');
+    syncHeight();
+  }
+
+  // ── Video playback ─────────────────────────────────────────────
+  // A <video autoplay> in a panel that was never visible does not start on its
+  // own, so playback is driven by hand whenever a tab becomes active.
+  function syncVideos(panel: HTMLElement | null) {
+    tabPanels.forEach(p => {
+      p.querySelectorAll<HTMLVideoElement>('video').forEach(video => {
+        if (p === panel && !reduceMotion.matches) {
+          // Rejects on browsers that refuse autoplay; ignore rather than
+          // surfacing an unhandled rejection in the console.
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    });
+  }
+
+  syncVideos(activePanel());
+  reduceMotion.addEventListener('change', () => syncVideos(activePanel()));
+
+  // ── Tab switching ──────────────────────────────────────────────
+  tabBtns.forEach((btn, index) => {
     btn.addEventListener('click', () => {
-      const target = btn.dataset.tab;
+      const panel = document.querySelector<HTMLElement>(`[data-panel="${btn.dataset.tab}"]`);
+      if (!panel || panel.classList.contains('active')) return;
+
+      // Slide in from the side the new role sits on: pick something further
+      // down the list and it enters from the right, further up from the left.
+      const from = tabPanels.indexOf(activePanel() as HTMLElement);
+      const dir  = index > from ? 1 : -1;
+      tabPanels.forEach(p => p.style.setProperty('--slide-from', `${dir * 24}px`));
+
       tabBtns.forEach(b => {
         b.classList.remove('active');
         b.setAttribute('aria-selected', 'false');
@@ -246,16 +556,48 @@ function dateRange(start: string, end?: string | null, current?: boolean) {
       });
       tabPanels.forEach(p => {
         p.classList.remove('active');
-        p.setAttribute('hidden', '');
+        // inert, not hidden: `hidden` implies display:none, which cannot be
+        // transitioned and would kill the cross-fade.
+        p.setAttribute('inert', '');
       });
+
       btn.classList.add('active');
       btn.setAttribute('aria-selected', 'true');
       btn.setAttribute('tabindex', '0');
-      const panel = document.querySelector<HTMLElement>(`[data-panel="${target}"]`);
-      if (panel) {
-        panel.classList.add('active');
-        panel.removeAttribute('hidden');
-      }
+      panel.classList.add('active');
+      panel.removeAttribute('inert');
+
+      syncHeight();
+      syncVideos(panel);
+    });
+  });
+
+  // ── Photo carousel ─────────────────────────────────────────────
+  // Arrows and dots both page inline. Neither is inside the <img>, so the
+  // lightbox's delegated click handler never sees them — paging through never
+  // opens the fullscreen viewer. Clicking the photo itself still does.
+  document.querySelectorAll<HTMLElement>('.exp-media').forEach(media => {
+    const track  = media.querySelector<HTMLElement>('[data-track]');
+    const dots   = Array.from(media.querySelectorAll<HTMLButtonElement>('.exp-dot'));
+    const arrows = Array.from(media.querySelectorAll<HTMLButtonElement>('.exp-arrow'));
+    const count  = media.querySelectorAll('.exp-slide').length;
+    if (!track || count < 2) return;
+
+    let current = 0;
+
+    function goTo(index: number) {
+      // Wrap around so both arrows stay useful at either end.
+      current = (index + count) % count;
+      track!.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach((d, di) => {
+        d.classList.toggle('active', di === current);
+        d.setAttribute('aria-current', di === current ? 'true' : 'false');
+      });
+    }
+
+    dots.forEach((dot, i) => dot.addEventListener('click', () => goTo(i)));
+    arrows.forEach(arrow => {
+      arrow.addEventListener('click', () => goTo(current + Number(arrow.dataset.step)));
     });
   });
 </script>

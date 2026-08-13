@@ -2,7 +2,7 @@
 import { getEntry } from 'astro:content';
 
 const aboutEntry = await getEntry('about', 'about');
-const resumePdf = aboutEntry?.data?.resumeUrl ?? null;
+const resumePdf = aboutEntry?.data?.resumePdf ?? null;
 
 const links = [
   { href: '#about',      label: 'About',      num: '01', section: 'about'      },

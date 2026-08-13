@@ -1,23 +1,10 @@
 ---
-// Update this content via the Keystatic admin at /keystatic → Skills
-const categories = [
-  {
-    category: "CAD & Design",
-    items: ["Onshape", "AutoCAD LT", "Autodesk Inventor Pro"],
-  },
-  {
-    category: "Programming & Software",
-    items: ["Python", "MATLAB", "Arduino", "Node-Red", "Linux", "Microsoft Office"],
-  },
-  {
-    category: "Industrial Automation",
-    items: ["MQTT", "VT-Scada", "Modbus RTU", "Protocol Gateways", "PLC Wiring"],
-  },
-  {
-    category: "Fabrication",
-    items: ["MIG Welding", "Stick Welding", "Rapid Prototyping"],
-  },
-];
+import { getEntry } from 'astro:content';
+
+const skills = (await getEntry('skills', 'skills'))?.data;
+const categories = (skills?.categories ?? []).filter(
+  c => c.category && c.items.length > 0
+);
 ---
 
 <section id="skills">
@@ -27,18 +14,24 @@ const categories = [
       <span class="section-rule" aria-hidden="true"></span>
     </div>
 
-    <div class="skills-grid reveal-group">
-      {categories.map(cat => (
-        <div class="skill-category">
-          <h3 class="cat-title">{cat.category}</h3>
-          <div class="cat-tags">
-            {cat.items.map(skill => (
-              <span class="skill-tag">{skill}</span>
-            ))}
+    {categories.length > 0 ? (
+      <div class="skills-grid reveal-group">
+        {categories.map(cat => (
+          <div class="skill-category">
+            <h3 class="cat-title">{cat.category}</h3>
+            <div class="cat-tags">
+              {cat.items.map(skill => (
+                <span class="skill-tag">{skill}</span>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    ) : (
+      <p style="color: var(--text-faint); font-style: italic;">
+        Add skill categories via the Keystatic admin at /keystatic
+      </p>
+    )}
   </div>
 </section>
 
